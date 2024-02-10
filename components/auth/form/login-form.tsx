@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import { LoginSchema } from "@/schemas";
+import { LoginSchema } from "@/schemas/zod";
 import { CardWrapper } from "@/components/auth/layout/card-wrapper";
 import {
   Form,
@@ -16,10 +16,9 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-// import { FormError } from "@/components/form-error";
 import { Alert } from "@/components/form/alert";
 import { login } from "@/actions/auth";
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { ActionResponseType, AuthResponseType } from "@/types";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
@@ -36,6 +35,7 @@ export const LoginForm = () => {
     type: "",
     message: "",
   });
+  const [showTwoFactor, setShowTwoFactor] = useState(false);
 
   const form = useForm<z.infer<typeof LoginSchema>>({
     resolver: zodResolver(LoginSchema),
@@ -52,14 +52,27 @@ export const LoginForm = () => {
     });
     startLoggingIn(async () => {
       const res = await login(values);
-      const type = Object.keys(res)?.[0] as ActionResponseType;
-      const message = res?.[type] || "";
-      setLoginResponse({
-        type,
-        message,
-      });
+      if (res?.twoFactor) {
+        setShowTwoFactor(true);
+      } else {
+        const type = Object.keys(res)?.[0] as ActionResponseType;
+        const message = res?.[type] || "";
+        form.reset();
+        setLoginResponse({
+          type,
+          message,
+        });
+      }
     });
   };
+
+  useEffect(() => {
+    if (showTwoFactor) {
+      setTimeout(() => {
+        form.setFocus("code");
+      }, 100);
+    }
+  }, [showTwoFactor]);
 
   return (
     <CardWrapper
@@ -71,52 +84,76 @@ export const LoginForm = () => {
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           <div className="space-y-4">
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email</FormLabel>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      disabled={isLoggingIn}
-                      placeholder="john@example.com"
-                      type="email"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="password"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Password</FormLabel>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      disabled={isLoggingIn}
-                      placeholder="********"
-                      type="password"
-                    />
-                  </FormControl>
-                  <Button
-                    size="sm"
-                    variant="link"
-                    className="px-0 font-normal"
-                    asChild
-                  >
-                    <Link href="/auth/reset">Forgot password?</Link>
-                  </Button>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            {showTwoFactor ? (
+              <FormField
+                control={form.control}
+                name="code"
+                key="code"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Two Factor Code</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        disabled={isLoggingIn}
+                        placeholder="123456"
+                        type="text"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            ) : (
+              <>
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email</FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          disabled={isLoggingIn}
+                          placeholder="john@example.com"
+                          type="email"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Password</FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          disabled={isLoggingIn}
+                          placeholder="********"
+                          type="password"
+                        />
+                      </FormControl>
+                      <Button
+                        size="sm"
+                        variant="link"
+                        className="px-0 font-normal"
+                        asChild
+                      >
+                        <Link href="/auth/reset">Forgot password?</Link>
+                      </Button>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </>
+            )}
           </div>
-          {/* <FormError message={urlError} /> */}
+
           <Alert
             variant={
               loginResponse?.type === "error" || !!urlError
@@ -126,7 +163,7 @@ export const LoginForm = () => {
             title={loginResponse?.message || urlError}
           />
           <Button type="submit" className="w-full" disabled={isLoggingIn}>
-            Login
+            {showTwoFactor ? "Confirm" : "Login"}
           </Button>
         </form>
       </Form>

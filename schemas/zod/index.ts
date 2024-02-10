@@ -3,6 +3,7 @@ import * as z from "zod";
 export const LoginSchema = z.object({
   email: z.string().email("Email is required"),
   password: z.string().min(1, "Password is required"), // login password no need validations #thuglyfe
+  code: z.optional(z.string()),
 });
 
 export const RegisterSchema = z.object({

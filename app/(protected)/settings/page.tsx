@@ -1,24 +1,24 @@
-import { auth, signOut } from "@/auth";
+"use client";
 
-const SettingsPage = async () => {
-  const session = await auth();
-  session?.user?.role;
+import { logout } from "@/actions/auth";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
+
+const SettingsPage = () => {
+  const user = useCurrentUser();
+
+  const handleLogout = () => {
+    logout();
+  };
+
   return (
-    <div className="flex flex-col gap-4 p-24">
-      <pre>{JSON.stringify(session, null, 2)}</pre>
-      <form
-        action={async () => {
-          "use server";
-          await signOut();
-        }}
+    <div className="bg-white p-10 rounded-xl border border-black">
+      <button
+        type="button"
+        onClick={handleLogout}
+        className="border border-slate-500 rounded-md p-4 hover:bg-slate-100"
       >
-        <button
-          type="submit"
-          className="border border-slate-500 rounded-md p-4 hover:bg-slate-100"
-        >
-          Sign Out
-        </button>
-      </form>
+        Sign Out
+      </button>
     </div>
   );
 };

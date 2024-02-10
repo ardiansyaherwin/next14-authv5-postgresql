@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import { NewPasswordSchema } from "@/schemas";
+import { NewPasswordSchema } from "@/schemas/zod";
 import { CardWrapper } from "@/components/auth/layout/card-wrapper";
 import {
   Form,

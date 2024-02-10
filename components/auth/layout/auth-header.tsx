@@ -1,5 +1,4 @@
 import { Poppins } from "next/font/google";
-import { cn } from "@/lib/utils";
 import { LockClosedIcon, LockOpen1Icon } from "@radix-ui/react-icons";
 
 const font = Poppins({
@@ -15,10 +14,8 @@ export const AuthHeader = ({ label }: AuthHeaderProps) => {
   return (
     <div className="w-full flex flex-col gap-y-4 items-center justify-center">
       <h1
-        className={cn(
-          "text-3xl font-semibold flex gap-2 items-center",
-          font.className
-        )}
+        className={`
+          text-3xl font-semibold flex gap-2 items-center ${font.className}`}
       >
         <LockClosedIcon /> <span>Auth</span> <LockOpen1Icon />
       </h1>
