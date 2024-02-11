@@ -23,12 +23,14 @@ import { ActionResponseType, AuthResponseType } from "@/types";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 
-export const LoginForm = () => {
+export const LoginForm = ({ fullWidth }: { fullWidth?: boolean }) => {
   const searchParams = useSearchParams();
   const urlError =
     searchParams.get("error") === "OAuthAccountNotLinked"
       ? "Email already in use with different provider"
       : "";
+
+  const callbackUrl = searchParams.get("callbackUrl");
 
   const [isLoggingIn, startLoggingIn] = useTransition();
   const [loginResponse, setLoginResponse] = useState<AuthResponseType>({
@@ -51,7 +53,7 @@ export const LoginForm = () => {
       message: "",
     });
     startLoggingIn(async () => {
-      const res = await login(values);
+      const res = await login(values, callbackUrl);
       if (res?.twoFactor) {
         setShowTwoFactor(true);
       } else {
@@ -79,6 +81,7 @@ export const LoginForm = () => {
       backButtonLabel="Don't have an account?"
       backButtonHref="/auth/register"
       showSocial
+      fullWidth={fullWidth}
     >
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">

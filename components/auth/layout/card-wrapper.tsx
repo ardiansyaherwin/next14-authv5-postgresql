@@ -9,6 +9,8 @@ import {
   CardFooter,
   CardHeader,
 } from "@/components/ui/card";
+import { HomeIcon } from "@radix-ui/react-icons";
+import Link from "next/link";
 
 interface CardWrapperProps {
   children: React.ReactNode;
@@ -16,6 +18,7 @@ interface CardWrapperProps {
   backButtonHref: string;
   backButtonLabel: string;
   showSocial?: boolean;
+  fullWidth?: boolean;
 }
 
 export const CardWrapper = ({
@@ -24,9 +27,10 @@ export const CardWrapper = ({
   backButtonHref,
   backButtonLabel,
   showSocial,
+  fullWidth,
 }: CardWrapperProps) => {
   return (
-    <Card className="w-[400px] shadow-md">
+    <Card className={`w-full ${!fullWidth ? "max-w-[400px]" : ""}  shadow-md`}>
       <CardHeader>
         <AuthHeader label={headerLabel} />
       </CardHeader>
@@ -36,8 +40,11 @@ export const CardWrapper = ({
           <AuthSocial />
         </CardFooter>
       )}
-      <CardFooter>
+      <CardFooter className="flex flex-col">
         <BackButton label={backButtonLabel} href={backButtonHref} />
+        <Link href="/">
+          <HomeIcon />
+        </Link>
       </CardFooter>
     </Card>
   );
