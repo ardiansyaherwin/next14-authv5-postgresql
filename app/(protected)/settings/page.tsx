@@ -131,18 +131,20 @@ const SettingsPage = () => {
                 )}
               />
 
-              <Label
-                htmlFor="toggle-password"
-                className="flex gap-2 items-center font-normal text-xs"
-              >
-                <Switch
-                  disabled={isPending}
-                  checked={showPassword}
-                  name="toggle-password"
-                  onCheckedChange={() => setShowPassword((prev) => !prev)}
-                />
-                Enable to update password
-              </Label>
+              {!user?.isOAuth && (
+                <Label
+                  htmlFor="toggle-password"
+                  className="flex gap-2 items-center font-normal text-xs"
+                >
+                  <Switch
+                    disabled={isPending}
+                    checked={showPassword}
+                    name="toggle-password"
+                    onCheckedChange={() => setShowPassword((prev) => !prev)}
+                  />
+                  Enable to update password
+                </Label>
+              )}
 
               {!user?.isOAuth && showPassword && (
                 <>
