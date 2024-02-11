@@ -5,5 +5,6 @@ declare module "next-auth" {
   interface User {
     role?: UserRole;
     isTwoFactorEnabled?: boolean;
+    isOAuth?: boolean;
   }
 }

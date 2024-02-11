@@ -5,6 +5,7 @@ import { db } from "@/lib/db";
 import { getUserById } from "@/data/user";
 import { DEFAULT_LOGIN_URL } from "@/routes";
 import { getTwoFactorConfirmationByUserId } from "@/data/two-factor-confirmation";
+import { getAccountByUserId } from "@/data/account";
 
 export const {
   handlers: { GET, POST },
@@ -60,15 +61,24 @@ export const {
       const existingUser = await getUserById(token.sub);
       if (!existingUser) return token;
 
+      const existingAccount = await getAccountByUserId(existingUser.id);
+
       // set role property in this callback so middleware can access it
+      token.isOAuth = !!existingAccount;
       token.role = existingUser.role;
+      token.name = existingUser.name;
+      token.email = existingUser.email;
       token.isTwoFactorEnabled = existingUser.isTwoFactorEnabled;
+
       return token;
     },
     // @ts-ignore // ignore token types in session
     async session({ token, session }) {
       if (session.user) {
         session.user.isTwoFactorEnabled = token?.isTwoFactorEnabled;
+        session.user.name = token?.name;
+        session.user.email = token?.email;
+        session.user.isOAuth = token?.isOAuth;
 
         if (token.sub) session.user.id = token.sub as string;
         if (token.role) session.user.role = token.role;

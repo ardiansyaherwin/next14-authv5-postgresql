@@ -2,7 +2,7 @@
 import { UserInfo } from "@/components/user-info";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 
-const ClientPage = async () => {
+const ClientPage = () => {
   const user = useCurrentUser();
 
   return (

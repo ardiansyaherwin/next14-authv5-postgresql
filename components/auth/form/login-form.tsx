@@ -57,7 +57,6 @@ export const LoginForm = () => {
       } else {
         const type = Object.keys(res)?.[0] as ActionResponseType;
         const message = res?.[type] || "";
-        form.reset();
         setLoginResponse({
           type,
           message,
